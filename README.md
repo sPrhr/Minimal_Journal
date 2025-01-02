@@ -72,6 +72,30 @@ npx expo start
    - Or use the Expo Go app and enter the URL manually
    - Make sure your phone and development machine are on the same network
 
+### Prebuild Setup
+
+1. Install EAS CLI
+```bash
+npm install -g eas-cli
+```
+
+2. Run prebuild for Android
+```bash
+npx expo prebuild --platform android
+```
+
+3. Configure Android development environment:
+   - Install Android Studio
+   - Install Android SDK (minimum SDK 21)
+   - Set up Android environment variables:
+     - ANDROID_HOME
+     - JAVA_HOME
+
+4. Verify setup
+```bash
+npx expo doctor
+```
+
 ### Building for Android
 
 1. Generate debug build
