@@ -30,12 +30,39 @@ A minimalist journaling app that automatically timestamps and organizes your dai
 
 ## Screenshots
 
-| Light Mode | Dark Mode |
-|------------|-----------|
-| ![Home Light](./Screenshots/light_home.png) | ![Home Dark](./Screenshots/dark_home.png) |
-| ![Calendar Light](./Screenshots/light_entries_1.png) | ![Calendar Dark](./Screenshots/dark_entries_1.png) |
-| ![Timeline Light](./Screenshots/light_entries_2.png) | ![Timeline Dark](./Screenshots/dark_entries_2.png) |
-| ![Settings Light](./Screenshots/light_settings.png) | ![Settings Dark](./Screenshots/dark_settings.png) |
+<div style="display: flex; justify-content: space-around;">
+  <div style="flex: 1;">
+    <h3 align="center">Light Mode</h3>
+    <p align="center">
+      <img src="./Screenshots/light_home.png" width="200" alt="Home Light" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/light_entries_1.png" width="200" alt="Calendar Light" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/light_entries_2.png" width="200" alt="Timeline Light" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/light_settings.png" width="200" alt="Settings Light" style="border-radius: 10px;">
+    </p>
+  </div>
+
+  <div style="flex: 1;">
+    <h3 align="center">Dark Mode</h3>
+    <p align="center">
+      <img src="./Screenshots/dark_home.png" width="200" alt="Home Dark" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/dark_entries_1.png" width="200" alt="Calendar Dark" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/dark_entries_2.png" width="200" alt="Timeline Dark" style="border-radius: 10px;">
+    </p>
+    <p align="center">
+      <img src="./Screenshots/dark_settings.png" width="200" alt="Settings Dark" style="border-radius: 10px;">
+    </p>
+  </div>
+</div>
 
 ## Installation
 
@@ -158,7 +185,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-sPrhr
+<a href="https://github.com/sPrhr">
+  <img src="https://github.com/sPrhr.png" width="50px" alt="sPrhr" style="border-radius: 50%;">
+</a>
 
 ## Acknowledgments
 
