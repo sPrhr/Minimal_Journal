@@ -30,12 +30,16 @@ A minimalist journaling app that automatically timestamps and organizes your dai
 
 ## Screenshots
 
+<div align="center">
+
 | Light Mode | Dark Mode |
-|------------|-----------|
+|:----------:|:---------:|
 | <img src="./Screenshots/light_home.png" width="200" alt="Home Light" style="border-radius: 10px;"> | <img src="./Screenshots/dark_home.png" width="200" alt="Home Dark" style="border-radius: 10px;"> |
 | <img src="./Screenshots/light_entries_1.png" width="200" alt="Calendar Light" style="border-radius: 10px;"> | <img src="./Screenshots/dark_entries_1.png" width="200" alt="Calendar Dark" style="border-radius: 10px;"> |
 | <img src="./Screenshots/light_entries_2.png" width="200" alt="Timeline Light" style="border-radius: 10px;"> | <img src="./Screenshots/dark_entries_2.png" width="200" alt="Timeline Dark" style="border-radius: 10px;"> |
 | <img src="./Screenshots/light_settings.png" width="200" alt="Settings Light" style="border-radius: 10px;"> | <img src="./Screenshots/dark_settings.png" width="200" alt="Settings Dark" style="border-radius: 10px;"> |
+
+</div>
 
 ## Installation
 
@@ -74,24 +78,19 @@ npx expo start
 
 ### Prebuild Setup
 
-1. Install EAS CLI
-```bash
-npm install -g eas-cli
-```
-
-2. Run prebuild for Android
+1. Run prebuild for Android
 ```bash
 npx expo prebuild --platform android
 ```
 
-3. Configure Android development environment:
+2. Configure Android development environment:
    - Install Android Studio
    - Install Android SDK (minimum SDK 21)
    - Set up Android environment variables:
      - ANDROID_HOME
      - JAVA_HOME
 
-4. Verify setup
+3. Verify setup
 ```bash
 npx expo doctor
 ```
@@ -107,6 +106,7 @@ cd android
 2. Generate release build
 ```bash
 cd android
+./gradlew clean
 ./gradlew assembleRelease
 ```
 

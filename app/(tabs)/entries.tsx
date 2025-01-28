@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, Button, TouchableOpacity, Alert, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Button, TouchableOpacity, Platform, StatusBar } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { LinearGradient } from 'expo-linear-gradient';
 import dbHandler from '../db/dbHandler';
@@ -38,28 +38,62 @@ const EntriesScreen: React.FC = () => {
   const [showEntries, setShowEntries] = React.useState(false);
   const [alertVisible, setAlertVisible] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
+  const [adjacentDates, setAdjacentDates] = React.useState<{prev: string | null, next: string | null}>({
+    prev: null,
+    next: null
+  });
 
   React.useEffect(() => {
-    if (!showEntries){
-      const loadDatesWithEntries = async () => {
-        try {
-          const dates = await dbHandler.getDatesWithEntries();
-          
-          const marked = dates.reduce((acc, date) => ({
-            ...acc,
-            [date.date]: { marked: true, dotColor: '#663399' }
-          }), {});
-          setMarkedDates(marked);
+    const loadTodayEntries = async () => {
+      try {
+        const dateEntries = await dbHandler.getEntriesForDate(date);
+        setEntries(dateEntries);
+        
+        // Only show entries view if there are entries for today
+        setShowEntries(dateEntries.length > 0);
+        
+        await findAdjacentDates(date);
+        
+        // Load marked dates in background
+        const dates = await dbHandler.getDatesWithEntries();
+        const marked = dates.reduce((acc, date) => ({
+          ...acc,
+          [date.date]: { marked: true, dotColor: '#663399' }
+        }), {});
+        setMarkedDates(marked);
+      } catch (error) {
+        console.error('Error loading today entries:', error);
+      }
+    };
 
-          return marked;
-        } catch (error) {
-          console.error('Error loading dates:', error);
-        }       
-      };
-
-      loadDatesWithEntries();
-    }
+    loadTodayEntries();
   }, []);
+
+  const findAdjacentDates = async (currentDate: string) => {
+    try {
+      const dates = await dbHandler.getDatesWithEntries();
+      const dateList = dates.map(d => d.date).sort();
+      const currentIndex = dateList.indexOf(currentDate);
+      
+      setAdjacentDates({
+        prev: currentIndex > 0 ? dateList[currentIndex - 1] : null,
+        next: currentIndex < dateList.length - 1 ? dateList[currentIndex + 1] : null
+      });
+    } catch (error) {
+      console.error('Error finding adjacent dates:', error);
+    }
+  };
+
+  const handleDateNavigation = async (direction: 'prev' | 'next') => {
+    const targetDate = direction === 'prev' ? adjacentDates.prev : adjacentDates.next;
+    if (targetDate) {
+      const dateEntries = await dbHandler.getEntriesForDate(targetDate);
+      setEntries(dateEntries);
+      setSelectedDate(targetDate);
+      setToDate(targetDate);
+      await findAdjacentDates(targetDate);
+    }
+  };
 
   const handleDayPress = async (day: DateData) => {
     setSelectedDate(day.dateString);
@@ -71,6 +105,9 @@ const EntriesScreen: React.FC = () => {
       if (dateList.includes(day.dateString)) {
         const dateEntries = await dbHandler.getEntriesForDate(day.dateString);
         setEntries(dateEntries);
+        setToDate(day.dateString);
+        setShowEntries(true);  // Show list view when date has entries
+        await findAdjacentDates(day.dateString);
       } else {
         setEntries([]);
         setAlertMessage('No entries for this date');
@@ -82,25 +119,10 @@ const EntriesScreen: React.FC = () => {
     }
   };
 
-  const handleSeeAll = () => {
-    setToDate(selectedDate);
-    setShowEntries(true);
+  const handleBack = () => {
+    setShowEntries(false);
+    setToDate('');
   };
-
-  React.useEffect(() => {
-    const loadInitialEntries = async () => {
-      try {
-        const dateEntries = await dbHandler.getEntriesForDate(date);
-        if (dateEntries.length > 0) {
-          setEntries(dateEntries);
-        }
-      } catch (error) {
-        console.error('Error loading initial entries:', error);
-      }
-    };
-
-    loadInitialEntries();
-  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -129,11 +151,6 @@ const EntriesScreen: React.FC = () => {
             <>
               <View style={styles.entriesHeaderContainer}>
                 <Text style={[styles.entriesHeader, { color: theme.text }]}>Entries</Text>
-                <Button 
-                  title="See All"
-                  color={theme.primary}
-                  onPress={handleSeeAll}
-                />
               </View>
               <ScrollView style={styles.entriesList}>
                 {entries.map(entry => (
@@ -156,18 +173,67 @@ const EntriesScreen: React.FC = () => {
                 style={styles.gradient}
                 pointerEvents="none"
               />
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => {
+                  setShowEntries(true);
+                  const dateToShow = selectedDate || date;
+                  setToDate(dateToShow);
+                  findAdjacentDates(dateToShow);
+                }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons 
+                  name="list" 
+                  size={24} 
+                  color="#fff"
+                />
+              </TouchableOpacity>
             </>
           )}
         </View>
       ) : (
         <View style={[styles.entriesContainer, { backgroundColor: theme.background }]}>
+          <View style={styles.dateNavigator}>
+            <TouchableOpacity 
+              onPress={() => handleDateNavigation('prev')}
+              disabled={!adjacentDates.prev}
+              style={styles.navButton}
+            >
+              <Ionicons 
+                name="chevron-back" 
+                size={24} 
+                color={adjacentDates.prev ? theme.text : theme.border}
+              />
+            </TouchableOpacity>
+            
+            <Text style={[styles.dateText, { color: theme.text }]}>
+              {new Date(toDate).toLocaleDateString('en-US', { 
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </Text>
+            
+            <TouchableOpacity 
+              onPress={() => handleDateNavigation('next')}
+              disabled={!adjacentDates.next}
+              style={styles.navButton}
+            >
+              <Ionicons 
+                name="chevron-forward" 
+                size={24} 
+                color={adjacentDates.next ? theme.text : theme.border}
+              />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity 
             style={styles.backButton}
-            onPress={() => setShowEntries(false)}
+            onPress={handleBack}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons 
-              name="arrow-back" 
+              name="calendar" 
               size={24} 
               color="#fff"
             />
@@ -320,6 +386,20 @@ const styles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: '#663399',
     borderRadius: 50,
+  },
+  dateNavigator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
+  dateText: {
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  navButton: {
+    padding: 5,
   },
 });
 

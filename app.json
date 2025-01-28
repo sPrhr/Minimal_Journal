@@ -23,7 +23,10 @@
       "permissions": [
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE"
-      ]
+      ],
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResourcesInReleaseBuilds": true,
+      "extraProguardRules": "-keep class com.yourapp.** { *; }"
     }
   }
 }
